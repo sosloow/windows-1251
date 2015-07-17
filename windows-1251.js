@@ -111,10 +111,39 @@
 		}
 		return result;
 	};
+	
+	var encodeURL = function(input) {
+	        var length = input.length;
+	        var index = -1;
+	        var codePoint;
+	        var pointer;
+	        var result = '';
+	        while (++index < length) {
+	            codePoint = input.charCodeAt(index);
+	            // “If `code point` is in the range U+0000 to U+007F, return a byte whose
+	            // value is `code point`.”
+	            if (codePoint >= 0x00 && codePoint <= 0x7F) {
+	                result += '%' + (codePoint<16?'0':'') + codePoint.toString(16);
+	                continue;
+	            }
+	            // “Let `pointer` be the index pointer for `code point` in index
+	            // `single-byte`.”
+	            if (hasOwnProperty.call(INDEX_BY_CODE_POINT, codePoint)) {
+	                pointer = INDEX_BY_CODE_POINT[codePoint];
+	                // “Return a byte whose value is `pointer + 0x80`.”
+	                result += '%' + (codePoint<16?'0':'') + (pointer + 0x80).toString(16);
+	            } else {
+	                // “If `pointer` is `null`, return `error` with `code point`.”
+	                result += error(codePoint, mode);
+	            }
+	        }
+	        return result.toUpperCase();
+	    };
 
 	var windows1251 = {
 		'encode': encode,
 		'decode': decode,
+		'encodeURL': encodeURL,
 		'labels': [
 			'cp1251',
 			'windows-1251',
